@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Glass To-Do</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+        }
+
+        .task-item {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .task-item:hover {
+            transform: translateX(4px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .completed {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <div class="w-full max-w-lg glass-card rounded-3xl p-6 sm:p-8 md:p-10 animate-fade-in">
+        <div class="flex justify-between items-center mb-6 gap-2">
+            <div class="text-white/70 text-sm font-medium flex items-center gap-2 overflow-hidden">
+                <i data-lucide="user" class="w-4 h-4 flex-shrink-0"></i> 
+                <span class="truncate">{{ request.user.username }}</span>
+            </div>
+            <div class="flex gap-2 flex-shrink-0">
+                <a href="{% url 'statistics' %}" class="p-2 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-xl transition-all" title="Statistics">
+                    <i data-lucide="pie-chart" class="w-4 h-4"></i>
+                </a>
+                <a href="{% url 'logout' %}" class="p-2 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-xl transition-all" title="Logout">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+
+        <header class="mb-8 md:mb-10 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Tasks</h1>
+            <p class="text-white/70 text-sm font-medium">Elevate your productivity</p>
+        </header>
+
+        <form action="{% url 'add_task' %}" method="POST" class="mb-8 group">
+            {% csrf_token %}
+            <div class="relative flex items-center">
+                <input type="text" name="title" placeholder="What needs to be done?" 
+                    class="w-full glass-input rounded-2xl py-4 px-6 text-white placeholder-white/40 font-medium pr-14"
+                    required autofocus>
+                <button type="submit" class="absolute right-2 p-3 bg-white/20 hover:bg-white/30 text-white rounded-xl transition-all active:scale-95">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </form>
+
+        <div class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+            {% if tasks %}
+                {% for task in tasks %}
+                    <div class="task-item group flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10">
+                        <div class="flex items-center space-x-3 sm:space-x-4 flex-1 cursor-pointer overflow-hidden" onclick="window.location.href='{% url 'toggle_task' task.pk %}'">
+                            <div class="w-6 h-6 rounded-lg border-2 flex-shrink-0 flex items-center justify-center transition-all duration-300 {% if task.is_completed %}bg-white border-white{% else %}border-white/30 group-hover:border-white/60{% endif %}">
+                                {% if task.is_completed %}
+                                    <i data-lucide="check" class="w-4 h-4 text-indigo-600"></i>
+                                {% endif %}
+                            </div>
+                            <span class="text-white font-medium transition-all duration-300 truncate {% if task.is_completed %}line-through opacity-50{% endif %}">
+                                {{ task.title }}
+                            </span>
+                        </div>
+                        <a href="{% url 'delete_task' task.pk %}" class="p-2 text-white/30 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all flex-shrink-0 ml-2">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-12 animate-fade-in">
+                    <div class="inline-flex p-4 rounded-3xl bg-white/5 mb-4">
+                        <i data-lucide="sparkles" class="w-8 h-8 text-white/40"></i>
+                    </div>
+                    <p class="text-white/40 font-medium text-lg">No tasks yet. Start something amazing!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <footer class="mt-10 pt-8 border-t border-white/10 text-center">
+            <div class="flex items-center justify-center space-x-2 text-white/40 text-[11px] font-bold uppercase tracking-[0.2em]">
+                <span>&copy; 2024</span>
+                <span class="w-1 h-1 rounded-full bg-white/20"></span>
+                <span>Glass To-Do App</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

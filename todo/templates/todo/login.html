@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Modern Glass To-Do</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        .glass-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <div class="w-full max-w-md glass-card rounded-3xl p-6 sm:p-8 md:p-10">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">Welcome Back</h1>
+            <p class="text-white/70 text-sm font-medium">Log in to manage your tasks</p>
+        </header>
+
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="p-3 rounded-xl bg-rose-500/20 border border-rose-500/50 text-rose-100 text-sm text-center">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <input type="email" name="email" placeholder="Email Address" 
+                    class="w-full glass-input rounded-2xl py-3 px-5 text-white placeholder-white/40 font-medium" required>
+            </div>
+            <div>
+                <input type="password" name="password" placeholder="Password" 
+                    class="w-full glass-input rounded-2xl py-3 px-5 text-white placeholder-white/40 font-medium" required>
+            </div>
+            <button type="submit" class="w-full py-3 px-5 bg-white text-indigo-600 hover:bg-white/90 rounded-2xl font-bold transition-all mt-4 shadow-lg">
+                Log In
+            </button>
+        </form>
+        <p class="mt-6 text-center text-white/70 text-sm">
+            Don't have an account? <a href="{% url 'signup' %}" class="text-white font-bold hover:underline">Sign up</a>
+        </p>
+    </div>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

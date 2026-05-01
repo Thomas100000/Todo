@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics - Modern Glass To-Do</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <div class="w-full max-w-lg glass-card rounded-3xl p-6 sm:p-8 md:p-10">
+        <header class="mb-8 md:mb-10 flex items-center justify-between gap-2">
+            <a href="{% url 'index' %}" class="p-2 flex-shrink-0 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-xl transition-all">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </a>
+            <div class="text-center overflow-hidden">
+                <h1 class="text-2xl sm:text-3xl font-bold text-white mb-1 tracking-tight truncate">Statistics</h1>
+                <p class="text-white/70 text-xs sm:text-sm font-medium truncate">Your task progress</p>
+            </div>
+            <div class="w-9 flex-shrink-0"></div>
+        </header>
+
+        {% if completed == 0 and pending == 0 %}
+            <div class="text-center py-12">
+                <div class="inline-flex p-4 rounded-3xl bg-white/5 mb-4">
+                    <i data-lucide="inbox" class="w-8 h-8 text-white/40"></i>
+                </div>
+                <p class="text-white/40 font-medium text-lg">No tasks yet.</p>
+            </div>
+        {% else %}
+            <div class="bg-white/5 rounded-3xl p-6 border border-white/10 flex justify-center items-center">
+                <div class="w-48 h-48">
+                    <canvas id="statsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-between text-white text-sm font-medium px-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-emerald-400"></div>
+                    Completed: {{ completed }}
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-full bg-rose-400"></div>
+                    Pending: {{ pending }}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        lucide.createIcons();
+        {% if completed > 0 or pending > 0 %}
+        const ctx = document.getElementById('statsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'Pending'],
+                datasets: [{
+                    data: [{{ completed }}, {{ pending }}],
+                    backgroundColor: ['#34d399', '#fb7185'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ' ' + context.label + ': ' + context.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        {% endif %}
+    </script>
+</body>
+</html>
