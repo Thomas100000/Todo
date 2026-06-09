@@ -95,7 +95,7 @@ DATABASES = {
     }
 }
 
-if 'DATABASE_URL' in os.environ:
+if 'DATABASE_URL' in os.environ and not os.environ.get('SUPABASE_DB_HOST'):
     DATABASES['default'] = dj_database_url.config(
         conn_max_age=600,
         conn_health_checks=True,
